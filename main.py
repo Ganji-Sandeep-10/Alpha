@@ -1,16 +1,10 @@
 from fastapi import FastAPI
 
-app=FastAPI()
+app = FastAPI()  # create an instance of FastAPI
 
-
-@app.get("/")
+@app.get("/")  # define a GET endpoint at the root "/"
 def main():
-    print("hello world")
-
-
-
-
-@app.get("/main")
-def hello():
-    print("hello world")
-
+    return {
+        "status": 200,
+        "message": "hello world"
+    }
