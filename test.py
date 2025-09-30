@@ -1,15 +1,17 @@
 import requests
-
+# app.py
+from fastapi import  HTTPException
 def fetch_files(repo_owner: str, repo_name: str, path: str = "") -> list[dict]:
     """
     Recursively fetch all files from a GitHub repo using the REST API.
-    
-    Returns:
-        A list of dicts: [{"path": str, "url": str}, ...]
+    Returns a list of dicts: [{"path": str, "url": str}, ...]
     """
     url = f"https://api.github.com/repos/{repo_owner}/{repo_name}/contents/{path}"
     response = requests.get(url)
-    response.raise_for_status()
+    
+    if response.status_code != 200:
+        raise HTTPException(status_code=response.status_code, detail=response.json())
+    
     items = response.json()
     files = []
     for item in items:
@@ -18,14 +20,3 @@ def fetch_files(repo_owner: str, repo_name: str, path: str = "") -> list[dict]:
         elif item["type"] == "dir":
             files.extend(fetch_files(repo_owner, repo_name, item["path"]))
     return files
-
-# Example usage (no print, just data return)
-repo_files = fetch_files("Ganji-Sandeep-10", "ToDo-List")
-
-# repo_files is now a list like:
-# [
-#   {"path": ".eslintrc.json", "url": "https://..."},
-#   {"path": "src/App.js", "url": "https://..."},
-#   {"path": "public/index.html", "url": "https://..."},
-#   ...
-# ]
